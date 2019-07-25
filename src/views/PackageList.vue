@@ -17,6 +17,7 @@
     </div>
     <div class="main-list">
       <a-table :columns="tableColumns" :rowKey="record => record.id" :dataSource="packageList">
+        <template slot="status" slot-scope="status">{{packageStatus[status]}}</template>
         <template slot="actions" slot-scope="record">
           <a-button
             type="primary"
@@ -43,17 +44,35 @@ const tableColumns = [
     title: "电话",
     dataIndex: "phone"
   },
-  { title: "状态", dataIndex: "status" },
+  {
+    title: "状态",
+    dataIndex: "status",
+    scopedSlots: { customRender: "status" }
+  },
   { title: "预约时间", dataIndex: "reserveTime" },
   { title: "操作", scopedSlots: { customRender: "actions" } }
 ];
 
 const filters = [
-  { name: "全部", filter: () => true },
-  { name: "未取件", filter: item => item.status === "PENDING" },
-  { name: "已预约", filter: item => item.status === "RESERVING" },
-  { name: "已取件", filter: item => item.status === "FINISHED" }
+  { name: "全部", filter: () => true, key: "ALL" },
+  { name: "未预约", filter: item => item.status === "PENDING", key: "PENDING" },
+  {
+    name: "已预约",
+    filter: item => item.status === "RESERVING",
+    key: "RESERVING"
+  },
+  {
+    name: "已取件",
+    filter: item => item.status === "FINISHED",
+    key: "FINISHED"
+  }
 ];
+
+const packageStatus = {
+  PENDING: "未预约",
+  RESERVING: "已预约",
+  FINISHED: "已取件"
+};
 
 export default {
   name: "PackageList",
@@ -65,7 +84,8 @@ export default {
       tableColumns,
       modalVisible: false,
       filters,
-      currentFilter: filters[0].filter
+      currentFilter: filters[0].filter,
+      packageStatus
     };
   },
   computed: {
@@ -95,8 +115,8 @@ export default {
   .title {
     flex: 1;
   }
-  .action-bar{
-      display: flex
+  .action-bar {
+    display: flex;
   }
 }
 </style>
