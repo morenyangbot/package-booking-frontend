@@ -2,14 +2,27 @@
   <div>
     <div class="header-bar">
       <h1 class="title">菜鸟驿站</h1>
-      <div class="acton-bar">
+      <div class="action-bar">
+        <div>
+          <a-radio-group @change="onFilterChange" v-model="currentFilter">
+            <a-radio-button
+              v-for="item in filters"
+              :key="item.name"
+              :value="item.filter"
+            >{{item.name}}</a-radio-button>
+          </a-radio-group>
+        </div>
         <a-button type="primary" @click="modalVisible = true">添加</a-button>
       </div>
     </div>
     <div class="main-list">
       <a-table :columns="tableColumns" :rowKey="record => record.id" :dataSource="packageList">
         <template slot="actions" slot-scope="record">
-          <a-button type="primary" v-if="record.status !== 'FINISHED'" @click="() => onConfirmReceipt(record)">确认收货</a-button>
+          <a-button
+            type="primary"
+            v-if="record.status !== 'FINISHED'"
+            @click="() => onConfirmReceipt(record)"
+          >确认收货</a-button>
         </template>
       </a-table>
     </div>
@@ -18,6 +31,7 @@
 </template>
 <script>
 import PackageAddModal from "../components/PackageAddModal";
+import { filter } from "minimatch";
 
 const tableColumns = [
   { title: "运单号", dataIndex: "no" },
@@ -34,6 +48,13 @@ const tableColumns = [
   { title: "操作", scopedSlots: { customRender: "actions" } }
 ];
 
+const filters = [
+  { name: "全部", filter: () => true },
+  { name: "未取件", filter: item => item.status === "PENDING" },
+  { name: "已预约", filter: item => item.status === "RESERVING" },
+  { name: "已取件", filter: item => item.status === "FINISHED" }
+];
+
 export default {
   name: "PackageList",
   components: {
@@ -42,21 +63,26 @@ export default {
   data() {
     return {
       tableColumns,
-      modalVisible: false
+      modalVisible: false,
+      filters,
+      currentFilter: filters[0].filter
     };
   },
   computed: {
     packageList() {
-      return this.$store.getters.packageList;
+      return this.$store.getters.packageList.filter(this.currentFilter);
     }
   },
   mounted() {
     this.$store.dispatch("fetchPackageList");
   },
-  methods:{
-      onConfirmReceipt(record){
-        this.$store.dispatch("confimReceipt",record)
-      }
+  methods: {
+    onConfirmReceipt(record) {
+      this.$store.dispatch("confimReceipt", record);
+    },
+    onFilterChange(e) {
+      this.currentFilter = e.target.value;
+    }
   }
 };
 </script>
@@ -68,6 +94,9 @@ export default {
   align-items: center;
   .title {
     flex: 1;
+  }
+  .action-bar{
+      display: flex
   }
 }
 </style>
