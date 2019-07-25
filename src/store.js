@@ -14,6 +14,10 @@ export default new Vuex.Store({
     },
     ADD_PACKAGE(state, payload) {
       state.packageList.push(payload)
+    },
+    UPDATE_PACKAGE(state, payload) {
+      const item = state.packageList.find(item => item.id === payload.id);
+      Object.assign(item, payload)
     }
   },
   actions: {
@@ -27,6 +31,12 @@ export default new Vuex.Store({
       PackageService.insertPackage(payload)
         .then(pkg => {
           commit("ADD_PACKAGE", pkg)
+        })
+    },
+    confimReceipt({ commit }, payload) {
+      PackageService.confirmReceipt(payload)
+        .then(pkg => {
+          commit("UPDATE_PACKAGE", pkg)
         })
     }
   },

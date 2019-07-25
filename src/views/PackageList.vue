@@ -7,9 +7,13 @@
       </div>
     </div>
     <div class="main-list">
-      <a-table :columns="tableColumns" :rowKey="record => record.id" :dataSource="packageList"></a-table>
+      <a-table :columns="tableColumns" :rowKey="record => record.id" :dataSource="packageList">
+        <template slot="actions" slot-scope="record">
+          <a-button type="primary" v-if="record.status !== 'FINISHED'" @click="() => onConfirmReceipt(record)">确认收货</a-button>
+        </template>
+      </a-table>
     </div>
-    <PackageAddModal v-model="modalVisible"/>
+    <PackageAddModal v-model="modalVisible" />
   </div>
 </template>
 <script>
@@ -27,7 +31,7 @@ const tableColumns = [
   },
   { title: "状态", dataIndex: "status" },
   { title: "预约时间", dataIndex: "reserveTime" },
-  { title: "操作" }
+  { title: "操作", scopedSlots: { customRender: "actions" } }
 ];
 
 export default {
@@ -48,6 +52,11 @@ export default {
   },
   mounted() {
     this.$store.dispatch("fetchPackageList");
+  },
+  methods:{
+      onConfirmReceipt(record){
+        this.$store.dispatch("confimReceipt",record)
+      }
   }
 };
 </script>
