@@ -11,6 +11,9 @@ export default new Vuex.Store({
   mutations: {
     SET_PACKAGE_LIST(state, list) {
       state.packageList = list
+    },
+    ADD_PACKAGE(state, payload) {
+      state.packageList.push(payload)
     }
   },
   actions: {
@@ -18,6 +21,12 @@ export default new Vuex.Store({
       PackageService.fetchPackageList()
         .then(list => {
           commit("SET_PACKAGE_LIST", list)
+        })
+    },
+    insertPackage({ commit }, payload) {
+      PackageService.insertPackage(payload)
+        .then(pkg => {
+          commit("ADD_PACKAGE", pkg)
         })
     }
   },
