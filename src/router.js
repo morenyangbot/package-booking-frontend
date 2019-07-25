@@ -25,6 +25,11 @@ export default new Router({
       path: '/packages',
       name: 'PackageList',
       component: () => import('./views/PackageList.vue')
+    },
+    {
+      path: '/packages/reverse',
+      name: 'ReverseReceipt',
+      component: () => import('./views/Reverse.vue')
     }
   ]
 })
